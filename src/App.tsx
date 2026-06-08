@@ -362,10 +362,10 @@ export default function App() {
             </div>
           </div>
 
-          {/* Secure SSL Connection status display */}
-          <div className="hidden md:flex items-center gap-5 text-xs text-white/90">
-            <span className="hover:text-[#F9D71C] cursor-pointer" onClick={() => setShowSecurityModal(true)}>Segurança Corporativa</span>
-            <span className="hover:text-[#F9D71C] cursor-pointer font-medium" onClick={() => setShowPrivacyModal(true)}>Políticas de Privacidade PJ</span>
+         {/* Secure SSL Connection status display */}
+          <div className="flex items-center gap-3 text-[11px] text-white/90 flex-wrap">
+           <span className="hover:text-[#F9D71C] cursor-pointer" onClick={() => setShowSecurityModal(true)}>Segurança Corporativa</span>
+           <span className="hover:text-[#F9D71C] cursor-pointer font-medium" onClick={() => setShowPrivacyModal(true)}>Políticas de Privacidade PJ</span>
             <div className="h-4 w-px bg-white/20"></div>
             <div className="flex items-center gap-1.5 text-emerald-300 bg-emerald-950/40 px-2.5 py-1 rounded-full font-medium border border-emerald-500/20">
               <Lock className="w-3.5 h-3.5" />
