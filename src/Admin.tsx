@@ -3,7 +3,7 @@ import {
   Lock, ShieldCheck, Phone, MessageCircle, Send, 
   Plus, Trash2, Save, RotateCcw, LogOut, AlertCircle, CheckCircle, Upload, Key, Check 
 } from 'lucide-react';
-import { DYNAMIC_SYSTEM_CONFIG, LoanRouteConfig, syncConfigToCookies, getConfig } from './config';
+import { DYNAMIC_SYSTEM_CONFIG, LoanRouteConfig, syncConfigToCookies, getFinalConfig, fetchRemoteConfig, applyRemoteConfig } from './config';
 import { getFacebookPixelId, saveFacebookPixelId } from './pixel';
 
 function clearCookie(name: string) {
@@ -57,6 +57,14 @@ export default function Admin() {
   });
   const [deploying, setDeploying] = useState(false);
   const [tokenSaved, setTokenSaved] = useState(false);
+
+  // 从 /config.json 拉取部署级配置（跨设备生效）
+  useEffect(() => {
+    fetchRemoteConfig().then(cfg => {
+      applyRemoteConfig(cfg);
+      setConfig(getFinalConfig());
+    });
+  }, []);
 
   const handleSaveToken = () => {
     if (githubToken.trim()) localStorage.setItem('bb_github_token', githubToken.trim());
@@ -112,7 +120,7 @@ export default function Admin() {
     const saved = localStorage.getItem(AUTH_KEY);
     if (saved === hashPassword(DEFAULT_PASSWORD)) {
       setAuthenticated(true);
-      setConfig(getConfig());
+      setConfig(getFinalConfig());
     }
   }, []);
 
@@ -121,7 +129,7 @@ export default function Admin() {
     if (hashPassword(password) === hashPassword(DEFAULT_PASSWORD)) {
       localStorage.setItem(AUTH_KEY, hashPassword(DEFAULT_PASSWORD));
       setAuthenticated(true);
-      setConfig(getConfig());
+      setConfig(getFinalConfig());
       setError('');
     } else {
       setError('Senha incorreta');
