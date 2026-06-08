@@ -60,7 +60,13 @@ export default function App() {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   useEffect(() => {
-    initializeFacebookPixel();
+    const idleCallback = window.requestIdleCallback || ((cb: IdleRequestCallback) => window.setTimeout(cb, 1200));
+    const idleId = idleCallback(() => initializeFacebookPixel());
+
+    return () => {
+      if (window.cancelIdleCallback) window.cancelIdleCallback(idleId);
+      else window.clearTimeout(idleId);
+    };
   }, []);
 
   // Processing Animation state
