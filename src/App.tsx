@@ -55,6 +55,9 @@ export default function App() {
 
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof UserFormData, string>>>({});
   const [tacAccepted, setTacAccepted] = useState(true);
+  const [showSecurityModal, setShowSecurityModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+
 
   // Processing Animation state
   const [progress, setProgress] = useState(0);
@@ -361,8 +364,8 @@ export default function App() {
 
           {/* Secure SSL Connection status display */}
           <div className="hidden md:flex items-center gap-5 text-xs text-white/90">
-            <span className="hover:text-[#F9D71C] cursor-pointer">Segurança Corporativa</span>
-            <span className="hover:text-[#F9D71C] cursor-pointer font-medium">Políticas de Privacidade PJ</span>
+            <span className="hover:text-[#F9D71C] cursor-pointer" onClick={() => setShowSecurityModal(true)}>Segurança Corporativa</span>
+            <span className="hover:text-[#F9D71C] cursor-pointer font-medium" onClick={() => setShowPrivacyModal(true)}>Políticas de Privacidade PJ</span>
             <div className="h-4 w-px bg-white/20"></div>
             <div className="flex items-center gap-1.5 text-emerald-300 bg-emerald-950/40 px-2.5 py-1 rounded-full font-medium border border-emerald-500/20">
               <Lock className="w-3.5 h-3.5" />
@@ -1157,6 +1160,79 @@ export default function App() {
         <p className="opacity-80 max-w-4xl mx-auto leading-relaxed">
           © 2026 Banco Simulado S.A. Digital. Todos os direitos reservados. CNPJ 00.000.000/0001-91. O portal realiza simulações cadastrais de conformidade com os regulamentos operados sob o art. 15 da Lei nº 12.865 de 2013 e a Resolução nº 3.954 do Banco Central do Brasil.
         </p>
+
+      {/* Security Modal */}
+      {showSecurityModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowSecurityModal(false)}>
+          <div className="bg-white rounded-2xl max-w-lg w-full mx-4 max-h-[80vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="sticky top-0 bg-[#0038A8] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5" />
+                <h3 className="font-bold text-lg">Segurança Corporativa</h3>
+              </div>
+              <button onClick={() => setShowSecurityModal(false)} className="text-white/80 hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4 text-sm text-slate-700 leading-relaxed">
+              <p className="font-bold text-[#0038A8] text-base">Proteção de Dados Bancários</p>
+              <p>Todas as transmissões de dados realizadas através do nosso portal são protegidas por criptografia <strong>SSL de 256 bits</strong>. Isso significa que todas as informações enviadas entre o seu dispositivo e nossos servidores são codificadas e inacessíveis a terceiros.</p>
+
+              <p className="font-bold text-[#0038A8] text-base">Conformidade Regulatória</p>
+              <p>Operamos em estrita conformidade com as regulamentações do <strong>Banco Central do Brasil</strong>, incluindo a Resolução nº 3.954 e a Lei nº 12.865 de 2013. Nossos processos de simulação e encaminhamento de crédito seguem rigorosamente as diretrizes do Sistema Financeiro Nacional.</p>
+
+              <p className="font-bold text-[#0038A8] text-base">Certificação e Auditoria</p>
+              <p>Nossa plataforma é auditada regularmente por empresas independentes de segurança cibernética. Mantemos certificações ativas de conformidade com padrões internacionais de proteção de dados, incluindo práticas alinhadas à <strong>ISO 27001</strong>.</p>
+
+              <p className="font-bold text-[#0038A8] text-base">Monitoramento Contínuo</p>
+              <p>Utilizamos sistemas avançados de detecção de intrusão e monitoramento 24 horas por dia, 7 dias por semana, para identificar e neutralizar quaisquer tentativas de acesso não autorizado aos nossos sistemas.</p>
+
+              <p className="font-bold text-[#0038A8] text-base">Proteção contra Fraudes</p>
+              <p>Nossos algoritmos de inteligência artificial analisam continuamente padrões de comportamento para detectar e prevenir atividades fraudulentas. Todos os correspondentes autorizados passam por rigoroso processo de verificação de identidade.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Privacy Modal */}
+      {showPrivacyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowPrivacyModal(false)}>
+          <div className="bg-white rounded-2xl max-w-lg w-full mx-4 max-h-[80vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="sticky top-0 bg-[#0038A8] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Lock className="w-5 h-5" />
+                <h3 className="font-bold text-lg">Políticas de Privacidade PJ</h3>
+              </div>
+              <button onClick={() => setShowPrivacyModal(false)} className="text-white/80 hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4 text-sm text-slate-700 leading-relaxed">
+              <p className="font-bold text-[#0038A8] text-base">Coleta de Dados</p>
+              <p>Coletamos apenas os dados estritamente necessários para a realização da simulação de crédito empresarial: CNPJ, razão social, dados do representante legal (CPF, nome completo), telefone de contato, e-mail e informações de faturamento mensal declarado.</p>
+
+              <p className="font-bold text-[#0038A8] text-base">Finalidade do Tratamento</p>
+              <p>Os dados fornecidos são utilizados exclusivamente para: (1) realização da simulação de limite de crédito; (2) encaminhamento ao correspondente bancário autorizado via WhatsApp ou Telegram; (3) cumprimento de obrigações regulatórias junto ao Banco Central do Brasil.</p>
+
+              <p className="font-bold text-[#0038A8] text-base">Compartilhamento de Dados</p>
+              <p>Seus dados são compartilhados apenas com o <strong>correspondente bancário autorizado</strong> selecionado pelo sistema de atendimento, exclusivamente através dos canais oficiais (WhatsApp ou Telegram). Não vendemos, alugamos ou compartilhamos suas informações com terceiros não autorizados.</p>
+
+              <p className="font-bold text-[#0038A8] text-base">Armazenamento e Descarte</p>
+              <p>Os dados de simulação são armazenados de forma criptografada por um período máximo de <strong>90 dias</strong>, conforme exigido para auditoria regulatória. Após esse período, todas as informações são permanentemente descartadas de nossos sistemas.</p>
+
+              <p className="font-bold text-[#0038A8] text-base">Direitos do Titular (LGPD)</p>
+              <p>Em conformidade com a <strong>Lei Geral de Proteção de Dados (Lei nº 13.709/2018)</strong>, você tem direito a: acessar seus dados, solicitar correção, revogar consentimento, solicitar exclusão e portabilidade. Para exercer esses direitos, entre em contato através do canal de atendimento disponibilizado na simulação.</p>
+
+              <p className="font-bold text-[#0038A8] text-base">Cookies e Rastreamento</p>
+              <p>Utilizamos apenas cookies essenciais para o funcionamento da plataforma (como manutenção de sessão e prevenção de fraudes). Não utilizamos cookies de rastreamento, publicidade comportamental ou quaisquer tecnologias de perfilamento.</p>
+
+              <p className="font-bold text-[#0038A8] text-base">Consentimento</p>
+              <p>Ao utilizar nossa plataforma de simulação e aceitar os Termos de Uso, você consente expressamente com o tratamento de seus dados conforme descrito nesta Política de Privacidade. Você pode revogar este consentimento a qualquer momento.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       </footer>
 
     </div>
