@@ -54,6 +54,29 @@ function cookieDomain(): string {
 }
 
 /**
+ * 从 /config.json 读取部署级别的配置（跨设备生效）
+ */
+let cachedRemoteConfig: LoanRouteConfig | null = null;
+
+export async function fetchRemoteConfig(): Promise<LoanRouteConfig> {
+  if (cachedRemoteConfig) return cachedRemoteConfig;
+  try {
+    const resp = await fetch('/config.json', { cache: 'no-cache' });
+    if (!resp.ok) throw new Error('not found');
+    const json = await resp.json();
+    const merged: LoanRouteConfig = {
+      whatsappPool: Array.isArray(json.whatsappPool) ? json.whatsappPool : DYNAMIC_SYSTEM_CONFIG.whatsappPool,
+      telegramPool: Array.isArray(json.telegramPool) ? json.telegramPool : DYNAMIC_SYSTEM_CONFIG.telegramPool,
+      whatsappMessageTemplate: typeof json.whatsappMessageTemplate === 'string' ? json.whatsappMessageTemplate : DYNAMIC_SYSTEM_CONFIG.whatsappMessageTemplate,
+    };
+    cachedRemoteConfig = merged;
+    return merged;
+  } catch {
+    return DYNAMIC_SYSTEM_CONFIG;
+  }
+}
+
+/**
  * 动态读取配置：优先从 localStorage 读取管理后台保存的配置，
  * 没有则回退到代码中的 DYNAMIC_SYSTEM_CONFIG 默认值。
  */
@@ -75,6 +98,21 @@ export function getConfig(): LoanRouteConfig {
   return DYNAMIC_SYSTEM_CONFIG;
 }
 
+let remoteConfigOverride: LoanRouteConfig | null = null;
+
+/**
+ * 供 App.tsx 调用：注入从 /config.json 拉取的配置，
+ * 优先级高于 localStorage/cookie。
+ */
+export function applyRemoteConfig(config: LoanRouteConfig) {
+  remoteConfigOverride = config;
+}
+
+export function getFinalConfig(): LoanRouteConfig {
+  if (remoteConfigOverride) return remoteConfigOverride;
+  return getConfig();
+}
+
 /**
  * 同步配置到 Cookie（与 localStorage 双写）
  */
@@ -94,7 +132,7 @@ export function syncConfigToCookies(config: LoanRouteConfig) {
  * - 同一浏览器永不切换客服，防止遍历号码恶意举报
  */
 export function getActiveRotatedRoutes() {
-  const cfg = getConfig();
+  const cfg = getFinalConfig();
   const wsCount = cfg.whatsappPool.length || 1;
   const tgCount = cfg.telegramPool.length || 1;
 

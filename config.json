@@ -1,0 +1,5 @@
+{
+  "whatsappPool": ["5511999999999", "5511888888888", "5531777777777"],
+  "telegramPool": ["https://t.me/suporte_financeiro_bb_bot", "https://t.me/suporte_financeiro_bb_2_bot"],
+  "whatsappMessageTemplate": "Olá! Sou {nome}, representante da empresa {nome_empresa} (CNPJ: {cnpj}). Acabei de simular nosso limite de crédito PJ no Banco Simulado de {prazo}x de {valor_parcela}. Gostaria de liberar o valor pré-aprovado de {valor_aprovado}. Protocolo: {codigo_atendimento}"
+}

@@ -28,7 +28,7 @@ import {
   Users
 } from 'lucide-react';
 import { LoanSimulationConfig, UserFormData, SimulationResult } from './types';
-import { DYNAMIC_SYSTEM_CONFIG, getActiveRotatedRoutes, advanceRotationIndex } from './config';
+import { DYNAMIC_SYSTEM_CONFIG, getActiveRotatedRoutes, advanceRotationIndex, fetchRemoteConfig, applyRemoteConfig } from './config';
 import { initializeFacebookPixel, trackFacebookContact } from './pixel';
 
 const SHOW_TELEGRAM_CTA = false;
@@ -60,6 +60,10 @@ export default function App() {
   const [tacAccepted, setTacAccepted] = useState(true);
   const [showSecurityModal, setShowSecurityModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+
+  useEffect(() => {
+    fetchRemoteConfig().then(cfg => applyRemoteConfig(cfg));
+  }, []);
 
   useEffect(() => {
     const idleCallback = window.requestIdleCallback || ((cb: IdleRequestCallback) => window.setTimeout(cb, 1200));
