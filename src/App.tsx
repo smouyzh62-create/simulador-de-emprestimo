@@ -31,6 +31,8 @@ import { LoanSimulationConfig, UserFormData, SimulationResult } from './types';
 import { DYNAMIC_SYSTEM_CONFIG, getActiveRotatedRoutes, advanceRotationIndex } from './config';
 import { initializeFacebookPixel, trackFacebookContact } from './pixel';
 
+const SHOW_TELEGRAM_CTA = false;
+
 export default function App() {
   // Simulation steps: 'PARAMETERS' | 'IDENTIFICATION' | 'PROCESSING' | 'RESULT'
   const [step, setStep] = useState<'PARAMETERS' | 'IDENTIFICATION' | 'PROCESSING' | 'RESULT'>('PARAMETERS');
@@ -1010,12 +1012,12 @@ export default function App() {
                       🔑 Liberação de Limite Requer Verificação
                     </h3>
                     <p className="text-xs text-slate-500 leading-relaxed">
-                      Seu saldo pré-aprovado de empréstimo está pronto. Selecione abaixo seu canal preferido para atendimento com nosso correspondente e conclua a assinatura eletrônica do contrato.
+                      Seu saldo pré-aprovado de empréstimo está pronto. Clique abaixo para falar com nosso correspondente e concluir a assinatura eletrônica do contrato.
                     </p>
                   </div>
 
-                  {/* THE CRITICAL REPLACEMENT: WhatsApp and Telegram buttons when limit pops up */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                  {/* Telegram can be re-enabled by setting SHOW_TELEGRAM_CTA to true. */}
+                  <div className={`grid grid-cols-1 ${SHOW_TELEGRAM_CTA ? 'sm:grid-cols-2' : 'max-w-md mx-auto'} gap-4 pt-1 w-full`}>
                     
                     {/* BUTTON 1: WhatsApp Button */}
                     <a 
@@ -1042,29 +1044,30 @@ export default function App() {
                       </span>
                     </a>
 
-                    {/* BUTTON 2: Telegram Button */}
-                    <a 
-                     id="telegram-claim-limit-cta"
-                     href={getTelegramLink()}
-                     target="_blank"
-                     rel="noopener noreferrer"
-                     className="bg-[#0088cc] hover:bg-[#007cbd] text-white p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] shadow-md tg-btn-glow cursor-pointer relative overflow-hidden group border border-[#0088cc]/20"
-                     onClick={() => trackFacebookContact('telegram')}
-                    >
-                      {/* Accent highlight */}
-                      <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 rounded-bl-full"></div>
+                    {SHOW_TELEGRAM_CTA && (
+                      <a 
+                       id="telegram-claim-limit-cta"
+                       href={getTelegramLink()}
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       className="bg-[#0088cc] hover:bg-[#007cbd] text-white p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] shadow-md tg-btn-glow cursor-pointer relative overflow-hidden group border border-[#0088cc]/20"
+                       onClick={() => trackFacebookContact('telegram')}
+                      >
+                        {/* Accent highlight */}
+                        <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 rounded-bl-full"></div>
 
-                      <div className="flex items-center gap-2">
-                        {/* Custom vector SVG Telegram logo */}
-                        <svg className="w-6 h-6 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.24-5.54 3.65-.52.36-.99.53-1.41.52-.46-.01-1.35-.26-2.01-.48-.81-.27-1.46-.42-1.4-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.66-2.88 8-3.42 3.81-1.55 4.6-1.82 5.12-1.83.11 0 .37.03.53.16.14.12.18.28.2.44.02.11.01.24-.01.37z"/>
-                        </svg>
-                        <span className="font-extrabold text-sm tracking-tight">RECEBER NO TELEGRAM</span>
-                      </div>
-                      <span className="text-[10px] text-white/95 font-medium mt-1">
-                        Atendimento com Robô Assistente
-                      </span>
-                    </a>
+                        <div className="flex items-center gap-2">
+                          {/* Custom vector SVG Telegram logo */}
+                          <svg className="w-6 h-6 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.24-5.54 3.65-.52.36-.99.53-1.41.52-.46-.01-1.35-.26-2.01-.48-.81-.27-1.46-.42-1.4-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.66-2.88 8-3.42 3.81-1.55 4.6-1.82 5.12-1.83.11 0 .37.03.53.16.14.12.18.28.2.44.02.11.01.24-.01.37z"/>
+                          </svg>
+                          <span className="font-extrabold text-sm tracking-tight">RECEBER NO TELEGRAM</span>
+                        </div>
+                        <span className="text-[10px] text-white/95 font-medium mt-1">
+                          Atendimento com Robô Assistente
+                        </span>
+                      </a>
+                    )}
 
                   </div>
 
