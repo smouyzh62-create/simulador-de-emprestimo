@@ -1,7 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { 
   Lock, ShieldCheck, Phone, MessageCircle, Send, 
-  Plus, Trash2, Save, RotateCcw, LogOut, AlertCircle, CheckCircle 
+  Plus, Trash2, Save, RotateCcw, LogOut, AlertCircle, CheckCircle, Upload, Key, Check 
 } from 'lucide-react';
 import { DYNAMIC_SYSTEM_CONFIG, LoanRouteConfig, syncConfigToCookies, getConfig } from './config';
 import { getFacebookPixelId, saveFacebookPixelId } from './pixel';
@@ -52,6 +52,61 @@ export default function Admin() {
   const [newWs, setNewWs] = useState('');
   const [newTg, setNewTg] = useState('');
   const [pixelId, setPixelId] = useState(() => getFacebookPixelId());
+  const [githubToken, setGithubToken] = useState(() => {
+    try { return localStorage.getItem('bb_github_token') || ''; } catch { return ''; }
+  });
+  const [deploying, setDeploying] = useState(false);
+  const [tokenSaved, setTokenSaved] = useState(false);
+
+  const handleSaveToken = () => {
+    if (githubToken.trim()) localStorage.setItem('bb_github_token', githubToken.trim());
+    else localStorage.removeItem('bb_github_token');
+    setTokenSaved(true);
+    setTimeout(() => setTokenSaved(false), 3000);
+  };
+
+  const handleDeploy = async () => {
+    setDeploying(true);
+    try {
+      const token = githubToken.trim() || localStorage.getItem('bb_github_token') || '';
+      if (!token) { alert('请先在下方填入 GitHub Token'); setDeploying(false); return; }
+
+      const configJson = JSON.stringify({
+        whatsappPool: config.whatsappPool,
+        telegramPool: config.telegramPool,
+        whatsappMessageTemplate: config.whatsappMessageTemplate,
+      }, null, 2);
+
+      // 获取当前 config.json 的 sha
+      const getResp = await fetch('https://api.github.com/repos/smouyzh62-create/simulador-de-emprestimo/contents/config.json', {
+        headers: { Authorization: 'token ' + token, Accept: 'application/vnd.github+json' },
+      });
+      if (!getResp.ok) { const err = await getResp.text(); throw new Error('GitHub: ' + getResp.status + ' ' + err); }
+      const fileInfo = await getResp.json();
+
+      // 更新文件
+      const putResp = await fetch('https://api.github.com/repos/smouyzh62-create/simulador-de-emprestimo/contents/config.json', {
+        method: 'PUT',
+        headers: { Authorization: 'token ' + token, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: 'Update WhatsApp numbers via admin panel',
+          content: btoa(unescape(encodeURIComponent(configJson))),
+          sha: fileInfo.sha,
+        }),
+      });
+      if (!putResp.ok) { const err = await putResp.text(); throw new Error('GitHub: ' + putResp.status + ' ' + err); }
+
+      saveConfigAndCookie(config);
+      saveFacebookPixelId(pixelId);
+      setSuccess('Publicado! Atualizando em 2 minutos.');
+      setTimeout(() => setSuccess(''), 6000);
+    } catch (e: any) {
+      setSuccess('Erro: ' + (e.message || 'Falha ao publicar'));
+      setTimeout(() => setSuccess(''), 6000);
+    } finally {
+      setDeploying(false);
+    }
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem(AUTH_KEY);
@@ -204,8 +259,19 @@ export default function Admin() {
           <input value={pixelId} onChange={e => setPixelId(e.target.value)} placeholder="Ex: 123456789012345" className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 font-mono placeholder:text-slate-500" />
         </section>
 
-        <div className="flex items-center gap-3 pt-2">
+        {/* GitHub Token */}
+        <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-3"><Key className="w-5 h-5 text-amber-400" /><h2 className="font-bold text-base">Token GitHub</h2></div>
+          <p className="text-xs text-slate-400 mb-3">Token para publicar config.json no repositorio. <a href="https://github.com/settings/tokens?type=beta" target="_blank" className="text-indigo-400 underline">Criar token</a> com permissao "Contents (Read and write)".</p>
+          <div className="flex items-center gap-2">
+            <input type="password" value={githubToken} onChange={e => setGithubToken(e.target.value)} placeholder="github_pat_..." className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500 font-mono placeholder:text-slate-500" />
+            <button onClick={handleSaveToken} className="flex items-center gap-1 bg-amber-600 hover:bg-amber-500 text-white rounded-lg px-3 py-2 text-xs font-semibold">{tokenSaved ? <Check className="w-4 h-4" /> : <Save className="w-4 h-4" />}{tokenSaved ? 'OK' : 'Salvar'}</button>
+          </div>
+        </section>
+
+        <div className="flex items-center gap-3 pt-2 flex-wrap">
           <button onClick={handleSave} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl text-sm shadow-lg"><Save className="w-4 h-4" />Salvar</button>
+          <button onClick={handleDeploy} disabled={deploying} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-xl text-sm shadow-lg disabled:opacity-50"><Upload className="w-4 h-4" />{deploying ? 'Publicando...' : 'Salvar + Publicar'}</button>
           <button onClick={handleReset} className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-5 py-3 rounded-xl text-sm border border-slate-700"><RotateCcw className="w-4 h-4" />Restaurar</button>
         </div>
         <p className="text-[10px] text-slate-600 text-center pt-4 border-t border-slate-800">Limpe o cache para restaurar o padrao.</p>
