@@ -3,8 +3,12 @@ import {
   Lock, ShieldCheck, Phone, MessageCircle, Send, 
   Plus, Trash2, Save, RotateCcw, LogOut, AlertCircle, CheckCircle 
 } from 'lucide-react';
-import { DYNAMIC_SYSTEM_CONFIG, LoanRouteConfig, syncConfigToCookies } from './config';
+import { DYNAMIC_SYSTEM_CONFIG, LoanRouteConfig, syncConfigToCookies, getConfig } from './config';
 import { getFacebookPixelId, saveFacebookPixelId } from './pixel';
+
+function clearCookie(name: string) {
+  document.cookie = name + '=; path=/; max-age=0; SameSite=Lax; domain=.hgsswsvip.top';
+}
 
 const AUTH_KEY = 'bb_admin_auth';
 const WS_POOL_KEY = 'bb_whatsapp_pool';
@@ -13,30 +17,20 @@ const MSG_TEMPLATE_KEY = 'bb_message_template';
 const DEFAULT_PASSWORD = 'admin123';
 const PLACEHOLDERS = ['{nome}', '{cpf}', '{cnpj}', '{nome_empresa}', '{prazo}', '{valor_parcela}', '{valor_aprovado}', '{codigo_atendimento}'];
 
-function readConfig(): LoanRouteConfig {
-  try {
-    const ws = localStorage.getItem(WS_POOL_KEY);
-    const tg = localStorage.getItem(TG_POOL_KEY);
-    const msg = localStorage.getItem(MSG_TEMPLATE_KEY);
-    const wsPool = ws ? JSON.parse(ws) : DYNAMIC_SYSTEM_CONFIG.whatsappPool;
-    const tgPool = tg ? JSON.parse(tg) : DYNAMIC_SYSTEM_CONFIG.telegramPool;
-    const template = msg || DYNAMIC_SYSTEM_CONFIG.whatsappMessageTemplate;
-    return { whatsappPool: wsPool, telegramPool: tgPool, whatsappMessageTemplate: template };
-  } catch {
-    return DYNAMIC_SYSTEM_CONFIG;
-  }
-}
-
-function saveConfig(config: LoanRouteConfig) {
+function saveConfigAndCookie(config: LoanRouteConfig) {
   localStorage.setItem(WS_POOL_KEY, JSON.stringify(config.whatsappPool));
   localStorage.setItem(TG_POOL_KEY, JSON.stringify(config.telegramPool));
   localStorage.setItem(MSG_TEMPLATE_KEY, config.whatsappMessageTemplate);
+  syncConfigToCookies(config);
 }
 
 function resetConfig() {
   localStorage.removeItem(WS_POOL_KEY);
   localStorage.removeItem(TG_POOL_KEY);
   localStorage.removeItem(MSG_TEMPLATE_KEY);
+  clearCookie('bb_whatsapp_pool');
+  clearCookie('bb_telegram_pool');
+  clearCookie('bb_message_template');
 }
 
 function hashPassword(pw: string): string {
@@ -63,7 +57,7 @@ export default function Admin() {
     const saved = localStorage.getItem(AUTH_KEY);
     if (saved === hashPassword(DEFAULT_PASSWORD)) {
       setAuthenticated(true);
-      setConfig(readConfig());
+      setConfig(getConfig());
     }
   }, []);
 
@@ -72,7 +66,7 @@ export default function Admin() {
     if (hashPassword(password) === hashPassword(DEFAULT_PASSWORD)) {
       localStorage.setItem(AUTH_KEY, hashPassword(DEFAULT_PASSWORD));
       setAuthenticated(true);
-      setConfig(readConfig());
+      setConfig(getConfig());
       setError('');
     } else {
       setError('Senha incorreta');
@@ -86,8 +80,7 @@ export default function Admin() {
   };
 
   const handleSave = () => {
-    saveConfig(config);
-    syncConfigToCookies(config);
+    saveConfigAndCookie(config);
     saveFacebookPixelId(pixelId);
     setSuccess('Configuracao salva!');
     setTimeout(() => setSuccess(''), 4000);
