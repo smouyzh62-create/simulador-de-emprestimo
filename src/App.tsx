@@ -1029,11 +1029,12 @@ export default function App() {
                     
                     {/* BUTTON 1: WhatsApp Button */}
                     <a 
-                      id="whatsapp-claim-limit-cta"
-                      href={getWhatsAppLink()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-[#25D366] hover:bg-[#20ba59] text-white p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] shadow-md ws-btn-glow cursor-pointer relative overflow-hidden group border border-[#25D366]/20"
+                     id="whatsapp-claim-limit-cta"
+                     href={getWhatsAppLink()}
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     className="bg-[#25D366] hover:bg-[#20ba59] text-white p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] shadow-md ws-btn-glow cursor-pointer relative overflow-hidden group border border-[#25D366]/20"
+                     onClick={() => { try { (window as any).fbq?.('track', 'Contact', {channel: 'whatsapp'}); } catch {} }}
                     >
                       {/* Accent highlight */}
                       <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 rounded-bl-full"></div>
@@ -1053,11 +1054,12 @@ export default function App() {
 
                     {/* BUTTON 2: Telegram Button */}
                     <a 
-                      id="telegram-claim-limit-cta"
-                      href={getTelegramLink()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-[#0088cc] hover:bg-[#007cbd] text-white p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] shadow-md tg-btn-glow cursor-pointer relative overflow-hidden group border border-[#0088cc]/20"
+                     id="telegram-claim-limit-cta"
+                     href={getTelegramLink()}
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     className="bg-[#0088cc] hover:bg-[#007cbd] text-white p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] shadow-md tg-btn-glow cursor-pointer relative overflow-hidden group border border-[#0088cc]/20"
+                     onClick={() => { try { (window as any).fbq?.('track', 'Contact', {channel: 'telegram'}); } catch {} }}
                     >
                       {/* Accent highlight */}
                       <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 rounded-bl-full"></div>
