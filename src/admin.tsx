@@ -56,6 +56,9 @@ export default function Admin() {
   const [config, setConfig] = useState<LoanRouteConfig>(DYNAMIC_SYSTEM_CONFIG);
   const [newWs, setNewWs] = useState('');
   const [newTg, setNewTg] = useState('');
+  const [pixelId, setPixelId] = useState(() => {
+    try { return localStorage.getItem('bb_fb_pixel_id') || ''; } catch { return ''; }
+  });
 
   useEffect(() => {
     const saved = localStorage.getItem(AUTH_KEY);
@@ -85,6 +88,11 @@ export default function Admin() {
 
   const handleSave = () => {
     saveConfig(config);
+    if (pixelId.trim()) {
+      localStorage.setItem('bb_fb_pixel_id', pixelId.trim());
+    } else {
+      localStorage.removeItem('bb_fb_pixel_id');
+    }
     setSuccess('Configuracao salva!');
     setTimeout(() => setSuccess(''), 4000);
   };
@@ -198,6 +206,13 @@ export default function Admin() {
           <div className="flex items-center gap-2 mb-5"><MessageCircle className="w-5 h-5 text-indigo-400" /><h2 className="font-bold text-base">Template da Mensagem</h2></div>
           <textarea value={config.whatsappMessageTemplate} onChange={e => setConfig(prev => ({ ...prev, whatsappMessageTemplate: e.target.value }))} rows={5} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 font-mono resize-y" />
           <div className="mt-3 flex flex-wrap gap-2"><span className="text-[10px] text-slate-500 mr-1 mt-0.5">Variaveis:</span>{PLACEHOLDERS.map(p => (<span key={p} className="text-[10px] bg-slate-800 text-indigo-300 px-2 py-0.5 rounded font-mono border border-slate-700">{p}</span>))}</div>
+        </section>
+
+        {/* Facebook Pixel */}
+        <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-3"><MessageCircle className="w-5 h-5 text-blue-400" /><h2 className="font-bold text-base">Facebook Pixel</h2></div>
+          <p className="text-xs text-slate-400 mb-3">Insira o ID do seu Pixel para rastrear conversoes.</p>
+          <input value={pixelId} onChange={e => setPixelId(e.target.value)} placeholder="Ex: 123456789012345" className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 font-mono placeholder:text-slate-500" />
         </section>
 
         <div className="flex items-center gap-3 pt-2">
