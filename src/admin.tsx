@@ -85,15 +85,15 @@ export default function Admin() {
 
   const handleSave = () => {
     saveConfig(config);
-    setSuccess('Configuração salva com sucesso! As alterações estão em vigor.');
+    setSuccess('Configuracao salva com sucesso!');
     setTimeout(() => setSuccess(''), 4000);
   };
 
   const handleReset = () => {
-    if (window.confirm('Tem certeza que deseja restaurar as configurações padrão?')) {
+    if (window.confirm('Restaurar configuracoes padrao?')) {
       resetConfig();
       setConfig(DYNAMIC_SYSTEM_CONFIG);
-      setSuccess('Configurações restauradas para o padrão.');
+      setSuccess('Restaurado para o padrao.');
       setTimeout(() => setSuccess(''), 4000);
     }
   };
@@ -155,15 +155,15 @@ export default function Admin() {
               <Lock className="w-6 h-6 text-white" />
             </div>
           </div>
-          <h2 className="text-white text-xl font-bold text-center mb-2">Painel de Administração</h2>
-          <p className="text-slate-400 text-sm text-center mb-6">Insira a senha para acessar as configurações</p>
+          <h2 className="text-white text-xl font-bold text-center mb-2">Painel de Administracao</h2>
+          <p className="text-slate-400 text-sm text-center mb-6">Insira a senha para acessar</p>
           <form onSubmit={handleLogin} className="space-y-4">
             <input
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="Senha"
-              className="w-full bg-slate-800 border border-slate-600 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full bg-slate-800 border border-slate-600 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500"
               autoFocus
             />
             {error && (
@@ -174,7 +174,7 @@ export default function Admin() {
             )}
             <button
               type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-xl transition-colors text-sm"
+              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-xl text-sm"
             >
               Entrar
             </button>
@@ -186,41 +186,35 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans">
-      {/* Header */}
       <header className="bg-slate-900 border-b border-slate-800 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center">
             <ShieldCheck className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-sm font-bold">Painel de Configuração</h1>
+            <h1 className="text-sm font-bold">Painel de Configuracao</h1>
             <p className="text-[10px] text-slate-400">Rotas de Atendimento</p>
           </div>
         </div>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-1.5 text-slate-400 hover:text-white text-xs transition-colors"
-        >
+        <button onClick={handleLogout} className="flex items-center gap-1.5 text-slate-400 hover:text-white text-xs">
           <LogOut className="w-4 h-4" />
           Sair
         </button>
       </header>
 
-      {/* Success Toast */}
       {success && (
-        <div className="fixed top-4 right-4 z-50 flex items-center gap-2 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-lg text-sm animate-in">
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-2 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-lg text-sm">
           <CheckCircle className="w-4 h-4" />
           {success}
         </div>
       )}
 
       <div className="max-w-3xl mx-auto px-6 py-8 space-y-8">
-        
-        {/* WhatsApp Pool */}
+
         <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
           <div className="flex items-center gap-2 mb-5">
             <Phone className="w-5 h-5 text-emerald-400" />
-            <h2 className="font-bold text-base">WhatsApp — Números de Atendimento</h2>
+            <h2 className="font-bold text-base">WhatsApp - Numeros</h2>
           </div>
           <div className="space-y-3">
             {config.whatsappPool.map((num, idx) => (
@@ -229,13 +223,9 @@ export default function Admin() {
                 <input
                   value={num}
                   onChange={e => updateWs(idx, e.target.value)}
-                  className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors font-mono"
+                  className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 font-mono"
                 />
-                <button
-                  onClick={() => removeWs(idx)}
-                  className="text-slate-500 hover:text-red-400 transition-colors p-1"
-                  title="Remover"
-                >
+                <button onClick={() => removeWs(idx)} className="text-slate-500 hover:text-red-400 p-1">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -246,24 +236,20 @@ export default function Admin() {
               value={newWs}
               onChange={e => setNewWs(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && addWs()}
-              placeholder="Novo número (ex: 551199990000)"
-              className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors font-mono placeholder:text-slate-500"
+              placeholder="Novo numero (ex: 551199990000)"
+              className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 font-mono placeholder:text-slate-500"
             />
-            <button
-              onClick={addWs}
-              className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-3 py-2 text-xs font-semibold transition-colors"
-            >
+            <button onClick={addWs} className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-3 py-2 text-xs font-semibold">
               <Plus className="w-4 h-4" />
               Adicionar
             </button>
           </div>
         </section>
 
-        {/* Telegram Pool */}
         <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
           <div className="flex items-center gap-2 mb-5">
             <Send className="w-5 h-5 text-sky-400" />
-            <h2 className="font-bold text-base">Telegram — Links de Atendimento</h2>
+            <h2 className="font-bold text-base">Telegram - Links</h2>
           </div>
           <div className="space-y-3">
             {config.telegramPool.map((link, idx) => (
@@ -272,13 +258,9 @@ export default function Admin() {
                 <input
                   value={link}
                   onChange={e => updateTg(idx, e.target.value)}
-                  className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500 transition-colors font-mono"
+                  className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500 font-mono"
                 />
-                <button
-                  onClick={() => removeTg(idx)}
-                  className="text-slate-500 hover:text-red-400 transition-colors p-1"
-                  title="Remover"
-                >
+                <button onClick={() => removeTg(idx)} className="text-slate-500 hover:text-red-400 p-1">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -290,58 +272,47 @@ export default function Admin() {
               onChange={e => setNewTg(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && addTg()}
               placeholder="Novo link (ex: https://t.me/seu_bot)"
-              className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500 transition-colors font-mono placeholder:text-slate-500"
+              className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500 font-mono placeholder:text-slate-500"
             />
-            <button
-              onClick={addTg}
-              className="flex items-center gap-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg px-3 py-2 text-xs font-semibold transition-colors"
-            >
+            <button onClick={addTg} className="flex items-center gap-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg px-3 py-2 text-xs font-semibold">
               <Plus className="w-4 h-4" />
               Adicionar
             </button>
           </div>
         </section>
 
-        {/* Message Template */}
         <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
           <div className="flex items-center gap-2 mb-5">
             <MessageCircle className="w-5 h-5 text-indigo-400" />
-            <h2 className="font-bold text-base">Template da Mensagem WhatsApp</h2>
+            <h2 className="font-bold text-base">Template da Mensagem</h2>
           </div>
           <textarea
             value={config.whatsappMessageTemplate}
             onChange={e => setConfig(prev => ({ ...prev, whatsappMessageTemplate: e.target.value }))}
             rows={5}
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors font-mono resize-y"
+            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 font-mono resize-y"
           />
           <div className="mt-3 flex flex-wrap gap-2">
-            <span className="text-[10px] text-slate-500 mr-1 mt-0.5">Variáveis:</span>
+            <span className="text-[10px] text-slate-500 mr-1 mt-0.5">Variaveis:</span>
             {PLACEHOLDERS.map(p => (
               <span key={p} className="text-[10px] bg-slate-800 text-indigo-300 px-2 py-0.5 rounded font-mono border border-slate-700">{p}</span>
             ))}
           </div>
         </section>
 
-        {/* Action Buttons */}
         <div className="flex items-center gap-3 pt-2">
-          <button
-            onClick={handleSave}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm shadow-lg shadow-indigo-600/25"
-          >
+          <button onClick={handleSave} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl text-sm shadow-lg">
             <Save className="w-4 h-4" />
-            Salvar Configurações
+            Salvar
           </button>
-          <button
-            onClick={handleReset}
-            className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-5 py-3 rounded-xl transition-colors text-sm border border-slate-700"
-          >
+          <button onClick={handleReset} className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-5 py-3 rounded-xl text-sm border border-slate-700">
             <RotateCcw className="w-4 h-4" />
-            Restaurar Padrão
+            Restaurar Padrao
           </button>
         </div>
 
         <p className="text-[10px] text-slate-600 text-center pt-4 border-t border-slate-800">
-          As configurações são armazenadas localmente no navegador. Limpe o cache para restaurar o padrão original.
+          Limpe o cache para restaurar o padrao original.
         </p>
       </div>
     </div>
