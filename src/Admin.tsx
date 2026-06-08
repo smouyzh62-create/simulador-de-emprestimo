@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { 
   Lock, ShieldCheck, Phone, MessageCircle, Send, 
   Plus, Trash2, Save, RotateCcw, LogOut, AlertCircle, CheckCircle 
 } from 'lucide-react';
 import { DYNAMIC_SYSTEM_CONFIG, LoanRouteConfig } from './config';
+import { getFacebookPixelId, saveFacebookPixelId } from './pixel';
 
 const AUTH_KEY = 'bb_admin_auth';
 const WS_POOL_KEY = 'bb_whatsapp_pool';
@@ -56,9 +57,7 @@ export default function Admin() {
   const [config, setConfig] = useState<LoanRouteConfig>(DYNAMIC_SYSTEM_CONFIG);
   const [newWs, setNewWs] = useState('');
   const [newTg, setNewTg] = useState('');
-  const [pixelId, setPixelId] = useState(() => {
-    try { return localStorage.getItem('bb_fb_pixel_id') || ''; } catch { return ''; }
-  });
+  const [pixelId, setPixelId] = useState(() => getFacebookPixelId());
 
   useEffect(() => {
     const saved = localStorage.getItem(AUTH_KEY);
@@ -68,7 +67,7 @@ export default function Admin() {
     }
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = (e: FormEvent) => {
     e.preventDefault();
     if (hashPassword(password) === hashPassword(DEFAULT_PASSWORD)) {
       localStorage.setItem(AUTH_KEY, hashPassword(DEFAULT_PASSWORD));
@@ -88,11 +87,7 @@ export default function Admin() {
 
   const handleSave = () => {
     saveConfig(config);
-    if (pixelId.trim()) {
-      localStorage.setItem('bb_fb_pixel_id', pixelId.trim());
-    } else {
-      localStorage.removeItem('bb_fb_pixel_id');
-    }
+    saveFacebookPixelId(pixelId);
     setSuccess('Configuracao salva!');
     setTimeout(() => setSuccess(''), 4000);
   };

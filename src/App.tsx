@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { LoanSimulationConfig, UserFormData, SimulationResult } from './types';
 import { DYNAMIC_SYSTEM_CONFIG, getActiveRotatedRoutes, advanceRotationIndex } from './config';
+import { initializeFacebookPixel, trackFacebookContact } from './pixel';
 
 export default function App() {
   // Simulation steps: 'PARAMETERS' | 'IDENTIFICATION' | 'PROCESSING' | 'RESULT'
@@ -58,26 +59,9 @@ export default function App() {
   const [showSecurityModal, setShowSecurityModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
- // Load Facebook Pixel from admin config
- useEffect(() => {
-   const pixelId = (() => {
-     try { return localStorage.getItem('bb_fb_pixel_id'); } catch { return null; }
-   })();
-   if (!pixelId) return;
-   const noscript = document.createElement('noscript');
-   noscript.innerHTML = '<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=' + pixelId + '&ev=PageView&noscript=1"/>';
-   document.head.appendChild(noscript);
-   const w = window as any;
-   (function(f,b,e,v,n,t,s){
-     if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-     if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-     n.queue=[];t=b.createElement(e);t.async=!0;
-     t.src=v;s=b.getElementsByTagName(e)[0];
-     s.parentNode.insertBefore(t,s)
-   })(w,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-   w.fbq('init', pixelId);
-   w.fbq('track', 'PageView');
- }, []);
+  useEffect(() => {
+    initializeFacebookPixel();
+  }, []);
 
   // Processing Animation state
   const [progress, setProgress] = useState(0);
@@ -1034,7 +1018,7 @@ export default function App() {
                      target="_blank"
                      rel="noopener noreferrer"
                      className="bg-[#25D366] hover:bg-[#20ba59] text-white p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] shadow-md ws-btn-glow cursor-pointer relative overflow-hidden group border border-[#25D366]/20"
-                     onClick={() => { try { (window as any).fbq?.('track', 'Contact', {channel: 'whatsapp'}); } catch {} }}
+                     onClick={() => trackFacebookContact('whatsapp')}
                     >
                       {/* Accent highlight */}
                       <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 rounded-bl-full"></div>
@@ -1059,7 +1043,7 @@ export default function App() {
                      target="_blank"
                      rel="noopener noreferrer"
                      className="bg-[#0088cc] hover:bg-[#007cbd] text-white p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] shadow-md tg-btn-glow cursor-pointer relative overflow-hidden group border border-[#0088cc]/20"
-                     onClick={() => { try { (window as any).fbq?.('track', 'Contact', {channel: 'telegram'}); } catch {} }}
+                     onClick={() => trackFacebookContact('telegram')}
                     >
                       {/* Accent highlight */}
                       <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 rounded-bl-full"></div>
