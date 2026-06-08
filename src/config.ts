@@ -76,6 +76,23 @@ export async function fetchRemoteConfig(): Promise<LoanRouteConfig> {
   }
 }
 
+const COUNTER_API_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+
+/**
+ * 从全局 Counter API 获取唯一序号，用于跨设备轮训
+ * 返回序号 (0~999998)，API 不可用时返回 -1
+ */
+export async function getGlobalCounter(): Promise<number> {
+  try {
+    const resp = await fetch(COUNTER_API_URL, { cache: 'no-store' });
+    if (!resp.ok) return -1;
+    const json = await resp.json();
+    return typeof json.value === 'number' ? json.value : -1;
+  } catch {
+    return -1;
+  }
+}
+
 /**
  * 动态读取配置：优先从 localStorage 读取管理后台保存的配置，
  * 没有则回退到代码中的 DYNAMIC_SYSTEM_CONFIG 默认值。
