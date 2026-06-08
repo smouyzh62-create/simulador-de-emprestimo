@@ -127,15 +127,16 @@ export function syncConfigToCookies(config: LoanRouteConfig) {
 /**
  * 获取当前轮询选中的 WhatsApp 号码和 Telegram 链接
  * 
- * 游客粘性锁定策略:
- * - 首次访问随机分配客服，存入 localStorage 永久锁定
- * - 同一浏览器永不切换客服，防止遍历号码恶意举报
+ * 轮询策略:
+ * - 使用全局顺序计数器 (Cookie)，每位新访客依次分配到不同客服
+ * - 单个访客锁定首次分配的客服 (localStorage)，防止遍历号码恶意举报
  */
 export function getActiveRotatedRoutes() {
   const cfg = getFinalConfig();
   const wsCount = cfg.whatsappPool.length || 1;
   const tgCount = cfg.telegramPool.length || 1;
 
+  const ROTATION_KEY = 'bb_round_robin_counter';
   let currentWsIndex = 0;
   let currentTgIndex = 0;
 
@@ -144,14 +145,22 @@ export function getActiveRotatedRoutes() {
     let savedTgIndex = localStorage.getItem('bb_locked_tg_index');
 
     if (savedWsIndex === null) {
-      const randomWs = Math.floor(Math.random() * wsCount);
-      localStorage.setItem('bb_locked_ws_index', randomWs.toString());
-      savedWsIndex = randomWs.toString();
+      // 从 Cookie 读取全局轮训位置
+      let counter = parseInt(getCookie(ROTATION_KEY) || '0', 10) || 0;
+      const assignedWs = counter % wsCount;
+      localStorage.setItem('bb_locked_ws_index', assignedWs.toString());
+      savedWsIndex = assignedWs.toString();
+      // 推进计数器
+      const next = (counter + 1) % 999999;
+      document.cookie = `${ROTATION_KEY}=${next}; path=/; max-age=31536000; SameSite=Lax${cookieDomain()}`;
     }
     if (savedTgIndex === null) {
-      const randomTg = Math.floor(Math.random() * tgCount);
-      localStorage.setItem('bb_locked_tg_index', randomTg.toString());
-      savedTgIndex = randomTg.toString();
+      let counter = parseInt(getCookie(ROTATION_KEY) || '0', 10) || 0;
+      const assignedTg = counter % tgCount;
+      localStorage.setItem('bb_locked_tg_index', assignedTg.toString());
+      savedTgIndex = assignedTg.toString();
+      const next = (counter + 1) % 999999;
+      document.cookie = `${ROTATION_KEY}=${next}; path=/; max-age=31536000; SameSite=Lax${cookieDomain()}`;
     }
 
     currentWsIndex = parseInt(savedWsIndex, 10) % wsCount;
@@ -173,8 +182,14 @@ export function getActiveRotatedRoutes() {
 }
 
 /**
- * 粘性政策：空实现，锁定客服永不跳转
+ * 推进轮训计数器（访客完成模拟后，下一位访客分配到下一个客服）
  */
 export function advanceRotationIndex() {
-  console.log('[Rotation System] Visitor-Sticky locked. No index rotation performed to protect your support team from multi-number reporting.');
+  try {
+    const ROTATION_KEY = 'bb_round_robin_counter';
+    let counter = parseInt(getCookie(ROTATION_KEY) || '0', 10) || 0;
+    const next = (counter + 1) % 999999;
+    document.cookie = `${ROTATION_KEY}=${next}; path=/; max-age=31536000; SameSite=Lax${cookieDomain()}`;
+    console.log('[Rotation] Counter advanced to', next);
+  } catch {}
 }
