@@ -39,14 +39,29 @@ export const DYNAMIC_SYSTEM_CONFIG: LoanRouteConfig = {
 };
 
 /**
+ * 读取 Cookie（兜底读取，解决某些环境下 localStorage 跨页面不可见的问题）
+ */
+function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+function cookieDomain(): string {
+  if (typeof window === 'undefined') return '';
+  const host = window.location.hostname;
+  return host === 'hgsswsvip.top' || host.endsWith('.hgsswsvip.top') ? '; domain=.hgsswsvip.top' : '';
+}
+
+/**
  * 动态读取配置：优先从 localStorage 读取管理后台保存的配置，
  * 没有则回退到代码中的 DYNAMIC_SYSTEM_CONFIG 默认值。
  */
 export function getConfig(): LoanRouteConfig {
   try {
-    const ws = localStorage.getItem('bb_whatsapp_pool');
-    const tg = localStorage.getItem('bb_telegram_pool');
-    const msg = localStorage.getItem('bb_message_template');
+    const ws = localStorage.getItem('bb_whatsapp_pool') || getCookie('bb_whatsapp_pool');
+    const tg = localStorage.getItem('bb_telegram_pool') || getCookie('bb_telegram_pool');
+    const msg = localStorage.getItem('bb_message_template') || getCookie('bb_message_template');
     if (ws || tg || msg) {
       return {
         whatsappPool: ws ? JSON.parse(ws) : DYNAMIC_SYSTEM_CONFIG.whatsappPool,
@@ -58,6 +73,17 @@ export function getConfig(): LoanRouteConfig {
     // localStorage 不可用时静默降级
   }
   return DYNAMIC_SYSTEM_CONFIG;
+}
+
+/**
+ * 同步配置到 Cookie（与 localStorage 双写）
+ */
+export function syncConfigToCookies(config: LoanRouteConfig) {
+  if (typeof document === 'undefined') return;
+  const domain = cookieDomain();
+  document.cookie = `bb_whatsapp_pool=${encodeURIComponent(JSON.stringify(config.whatsappPool))}; path=/; max-age=31536000; SameSite=Lax${domain}`;
+  document.cookie = `bb_telegram_pool=${encodeURIComponent(JSON.stringify(config.telegramPool))}; path=/; max-age=31536000; SameSite=Lax${domain}`;
+  document.cookie = `bb_message_template=${encodeURIComponent(config.whatsappMessageTemplate)}; path=/; max-age=31536000; SameSite=Lax${domain}`;
 }
 
 /**

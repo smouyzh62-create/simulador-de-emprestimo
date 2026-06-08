@@ -3,7 +3,7 @@ import {
   Lock, ShieldCheck, Phone, MessageCircle, Send, 
   Plus, Trash2, Save, RotateCcw, LogOut, AlertCircle, CheckCircle 
 } from 'lucide-react';
-import { DYNAMIC_SYSTEM_CONFIG, LoanRouteConfig } from './config';
+import { DYNAMIC_SYSTEM_CONFIG, LoanRouteConfig, syncConfigToCookies } from './config';
 import { getFacebookPixelId, saveFacebookPixelId } from './pixel';
 
 const AUTH_KEY = 'bb_admin_auth';
@@ -87,6 +87,7 @@ export default function Admin() {
 
   const handleSave = () => {
     saveConfig(config);
+    syncConfigToCookies(config);
     saveFacebookPixelId(pixelId);
     setSuccess('Configuracao salva!');
     setTimeout(() => setSuccess(''), 4000);
