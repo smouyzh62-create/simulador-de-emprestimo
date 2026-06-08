@@ -66,6 +66,19 @@ export default function App() {
     fetchRemoteConfig().then(cfg => applyRemoteConfig(cfg));
   }, []);
 
+  // 在页面加载时从全局 Counter API 获取序号，用于跨设备轮训
+  useEffect(() => {
+    if (typeof getGlobalCounter === 'function') {
+      getGlobalCounter().then(counter => {
+        if (counter >= 0 && !localStorage.getItem('bb_locked_ws_index')) {
+          const pool = getFinalConfig().whatsappPool;
+          const assigned = counter % pool.length;
+          localStorage.setItem('bb_locked_ws_index', assigned.toString());
+        }
+      }).catch(() => {});
+    }
+  }, []);
+
   useEffect(() => {
     const idleCallback = window.requestIdleCallback || ((cb: IdleRequestCallback) => window.setTimeout(cb, 1200));
     const idleId = idleCallback(() => initializeFacebookPixel());
@@ -347,35 +360,15 @@ export default function App() {
   };
 
   const getTelegramLink = () => {
+    const savedIdx = localStorage.getItem('bb_locked_tg_index');
+    if (savedIdx !== null) {
+      const pool = getFinalConfig().telegramPool;
+      return pool[parseInt(savedIdx)] || pool[0];
+    }
     return getActiveRotatedRoutes().telegramLink;
   };
 
-  const handleWhatsAppClick = async () => {
-    const counter = await getGlobalCounter();
-    if (counter >= 0 && !localStorage.getItem('bb_locked_ws_index')) {
-      const pool = getFinalConfig().whatsappPool;
-      const assigned = counter % pool.length;
-      localStorage.setItem('bb_locked_ws_index', assigned.toString());
-      const rawNum = pool[assigned].replace(/\D/g, '');
-      const msg = DYNAMIC_SYSTEM_CONFIG.whatsappMessageTemplate
-        .replace(/{nome}/g, formData.fullName)
-        .replace(/{cpf}/g, formData.cpf)
-        .replace(/{cnpj}/g, formData.hasCNPJ ? formData.cnpj : 'Sem CNPJ')
-        .replace(/{nome_empresa}/g, formData.hasCNPJ ? formData.companyName : 'Pessoa Física Autônoma')
-        .replace(/{prazo}/g, result.installments.toString())
-        .replace(/{valor_parcela}/g, `R$ ${result.installmentValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)
-        .replace(/{valor_aprovado}/g, `R$ ${result.approvedAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)
-        .replace(/{codigo_atendimento}/g, `#BB-${customInviteCode}`);
-      const link = `https://api.whatsapp.com/send?phone=${rawNum}&text=${encodeURIComponent(msg)}`;
-      window.open(link, '_blank');
-      return;
-    }
-    window.open(getWhatsAppLink(), '_blank');
-  };
 
-  const handleTelegramClick = () => {
-    window.open(getTelegramLink(), '_blank');
-  };
 
   return (
     <div className="min-h-screen bg-[#F9D71C] font-sans text-[#0038A8] selection:bg-[#0038A8] selection:text-[#F9D71C] relative pb-20">
@@ -1053,9 +1046,11 @@ export default function App() {
                     {/* BUTTON 1: WhatsApp Button */}
                     <a 
                      id="whatsapp-claim-limit-cta"
-                     href="#"
+                     href={getWhatsAppLink()}
+                     target="_blank"
+                     rel="noopener noreferrer"
                      className="bg-[#25D366] hover:bg-[#20ba59] text-white p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] shadow-md ws-btn-glow cursor-pointer relative overflow-hidden group border border-[#25D366]/20"
-                     onClick={() => { handleWhatsAppClick(); trackFacebookContact('whatsapp'); }}
+                     onClick={() => trackFacebookContact('whatsapp')}
                     >
                       {/* Accent highlight */}
                       <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 rounded-bl-full"></div>
@@ -1076,9 +1071,11 @@ export default function App() {
                     {SHOW_TELEGRAM_CTA && (
                       <a 
                        id="telegram-claim-limit-cta"
-                       href="#"
+                       href={getTelegramLink()}
+                       target="_blank"
+                       rel="noopener noreferrer"
                        className="bg-[#0088cc] hover:bg-[#007cbd] text-white p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] shadow-md tg-btn-glow cursor-pointer relative overflow-hidden group border border-[#0088cc]/20"
-                       onClick={() => { handleTelegramClick(); trackFacebookContact('telegram'); }}
+                       onClick={() => trackFacebookContact('telegram')}
                       >
                         {/* Accent highlight */}
                         <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 rounded-bl-full"></div>
