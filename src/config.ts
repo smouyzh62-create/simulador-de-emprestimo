@@ -76,7 +76,7 @@ export async function fetchRemoteConfig(): Promise<LoanRouteConfig> {
   }
 }
 
-const COUNTER_API_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+const COUNTER_API_URL = 'https://script.google.com/macros/s/AKfycbxxGQT9zyM-kXtRZGW7QqX3whUQv1GZ3t5fk75NnsW8THlef2jpTwTaaATDfabewM002g/exec';
 
 /**
  * 从全局 Counter API 获取唯一序号，用于跨设备轮训
