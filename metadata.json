@@ -1,0 +1,6 @@
+{
+  "name": "Simulador de Empréstimo",
+  "description": "Simulador de crédito e empréstimo rápido inspirado no Banco do Brasil. Simule seu limite de forma imediata.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
